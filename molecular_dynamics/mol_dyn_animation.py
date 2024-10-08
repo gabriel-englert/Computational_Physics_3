@@ -1,7 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-n_particles = 50
+
+def read_L_N_from_file(filename):
+    with open(filename, 'r') as file:
+        # Lê a primeira linha
+        first_line = file.readline().strip()
+        # Divide a linha em partes
+        parts = first_line.split()
+        # Atribui os valores de L e N (considerando que 'L=' e 'N=' são os prefixos)
+        L = int(parts[1].split('=')[1])
+        N = int(parts[2].split('=')[1])
+    return L, N
+
 # Função para carregar os dados do arquivo .dat
 def carregar_dados(arquivo,n_particles):
     # Carrega os dados assumindo que estão em colunas t, x, y
@@ -27,25 +38,24 @@ def atualizar(frame):
     return particulas + [tempo_text]
 
 # Carregar os dados do arquivo .dat
-arquivo = 'particle_animation.dat'  # Substitua pelo caminho do seu arquivo
-t, x, y = carregar_dados(arquivo,n_particles)
-print(x[0][1000])
+arquivo = 'data_LJ.dat'  # Substitua pelo caminho do seu arquivo
+L, N = read_L_N_from_file(arquivo)
+t, x, y = carregar_dados(arquivo,N)
 # Configuração do gráfico
 fig, ax = plt.subplots()
-ax.set_xlim(0,100)
-ax.set_ylim(0,100)
+ax.set_xlim(0,L)
+ax.set_ylim(0,L)
 ax.set_xlabel('Posição X')
 ax.set_ylabel('Posição Y')
 
 # Criando o marcador da partícula
-particulas = [ax.plot([], [], 'bo', ms=10)[0] for _ in range(n_particles)]
-print(particulas)
+particulas = [ax.plot([], [], 'bo', ms=5)[0] for _ in range(N)]
 
 # Adicionando o texto para mostrar o tempo
 tempo_text = ax.text(0.05, 0.95, '', transform=ax.transAxes, fontsize=12, verticalalignment='top')
 
 # Criação da animação
-anim = FuncAnimation(fig, atualizar, frames=len(t), init_func=init, interval=1, blit=True)
+anim = FuncAnimation(fig, atualizar, frames=len(t), init_func=init, interval=0.1, blit=True)
 
 # Mostra a animação
 plt.show()
